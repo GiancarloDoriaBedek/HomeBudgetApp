@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+fastapi-jwt-auth
+passlib[bcrypt]
+psycopg2-binary

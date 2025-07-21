@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String, Boolean, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Integer, Numeric, String, Boolean, DateTime
 from datetime import datetime, timezone
 
 from app.db import Base
@@ -15,3 +15,8 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now(timezone.utc), nullable=False)
     updated_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    starting_balance: Mapped[float] = mapped_column(Numeric(10, 2), default=1000.00, nullable=False)
+
+    categories = relationship("Category", back_populates="user", cascade="all, delete")
+    expenses = relationship("Expense", back_populates="user")
+

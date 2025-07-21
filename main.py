@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import auth_router, user_router
+from app.routes import auth_router, user_router, category_router, expense_router, balance_router
 from app.db import Base, engine
 
 app = FastAPI(
@@ -10,7 +10,8 @@ app = FastAPI(
 
 app.include_router(auth_router.auth_router, prefix="/api")
 app.include_router(user_router.user_router,  prefix="/api", tags=["Users"])
-# app.include_router(category.router, prefix="/categories", tags=["Categories"])
-# app.include_router(expense.router, prefix="/expenses", tags=["Expenses"])
+app.include_router(category_router.category_router, prefix="/api", tags=["Categories"])
+app.include_router(expense_router.expense_router, prefix="/api", tags=["Expenses"])
+app.include_router(balance_router.balance_router, prefix="/api")
 
 Base.metadata.create_all(bind=engine)

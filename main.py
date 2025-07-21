@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import auth, category, expense
+from app.routes import auth_router, user_router
 from app.db import Base, engine
 
 app = FastAPI(
@@ -8,7 +8,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# app.include_router(auth.router, prefix="/auth", tags=["Auth"])
+app.include_router(auth_router.auth_router, prefix="/api")
+app.include_router(user_router.user_router,  prefix="/api", tags=["Users"])
 # app.include_router(category.router, prefix="/categories", tags=["Categories"])
 # app.include_router(expense.router, prefix="/expenses", tags=["Expenses"])
 

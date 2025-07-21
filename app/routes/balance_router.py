@@ -12,7 +12,15 @@ balance_router = APIRouter(
     tags=["Balance"]
 )
 
-@balance_router.get("/balance", summary="Get current balance")
+@balance_router.get(
+        "/", 
+        summary="Get current balance",
+        description=(
+        "Returns the user's current financial balance.\n\n"
+        "- `starting_balance`: The users initial balance.\n"
+        "- `total_spent`: Total expenses recorded by the user.\n"
+        "- `current_balance`: The remaining balance (starting balance minus total spent)."),
+    operation_id="get_current_balance")
 def get_balance(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)

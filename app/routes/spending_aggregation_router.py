@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, status
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.orm import Session
@@ -11,7 +11,14 @@ spending_aggregation_router = APIRouter(
     tags=["Report"]
 )
 
-@spending_aggregation_router.get("/")
+@spending_aggregation_router.get(
+    "/",
+    summary="Get total spending",
+    description=(
+        "Calculate the total spending of the authenticated user, "
+        "optionally filtered by date range and category."
+    ),
+    status_code=status.HTTP_200_OK)
 def total_spending(
     start_date: Optional[datetime] = Query(None),
     end_date: Optional[datetime] = Query(None),

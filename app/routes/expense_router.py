@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
@@ -20,7 +20,12 @@ expense_router = APIRouter(
     tags=["Expenses"]
 )
 
-@expense_router.post("/", response_model=ExpenseRead)
+@expense_router.post(
+    "/",
+    response_model=ExpenseRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new expense",
+    description="Create a new expense record for the authenticated user.")
 def create_new_expense(
     expense: ExpenseCreate,
     db: Session = Depends(get_db),
@@ -29,7 +34,13 @@ def create_new_expense(
     return create_expense(db, expense, current_user)
 
 
-@expense_router.get("/", response_model=List[ExpenseRead])
+@expense_router.get(
+    "/",
+    response_model=List[ExpenseRead],
+    summary="Get expenses with optional filters",
+    description=(
+        "Retrieve a list of expenses for the authenticated user, "
+        "optionally filtered by category, amount range, and date range."))
 def read_expenses(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -48,8 +59,12 @@ def read_expenses(
         end_date=end_date
     )
 
-
-@expense_router.get("/{expense_id}", response_model=ExpenseRead)
+@expense_router.get(
+    "/{expense_id}",
+    response_model=ExpenseRead,
+    summary="Get expense by ID",
+    description="Retrieve a single expense by its ID if owned by the authenticated user.",
+    responses={404: {"description": "Expense not found"}})
 def read_single_expense(
     expense_id: int,
     db: Session = Depends(get_db),
@@ -62,7 +77,12 @@ def read_single_expense(
     return expense
 
 
-@expense_router.put("/{expense_id}", response_model=ExpenseRead)
+@expense_router.put(
+    "/{expense_id}",
+    response_model=ExpenseRead,
+    summary="Update an existing expense",
+    description="Update expense details if it belongs to the authenticated user.",
+    responses={404: {"description": "Expense not found or not owned by user"}})
 def update_existing_expense(
     expense_id: int,
     update_data: ExpenseUpdate,
@@ -76,7 +96,12 @@ def update_existing_expense(
     return expense
 
 
-@expense_router.delete("/{expense_id}", status_code=204)
+@expense_router.delete(
+    "/{expense_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an expense",
+    description="Delete an expense by ID if it belongs to the authenticated user.",
+    responses={404: {"description": "Expense not found or not owned by user"}})
 def delete_existing_expense(
     expense_id: int,
     db: Session = Depends(get_db),

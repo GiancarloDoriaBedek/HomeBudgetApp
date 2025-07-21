@@ -14,7 +14,18 @@ auth_router = APIRouter(
 )
 
 
-@auth_router.post('/token')
+@auth_router.post(
+    '/token',
+    response_model=Token,
+    summary="User login and token generation",
+    description=(
+        "Authenticate user credentials and generate a JWT access token.\n\n"
+        "The token expires after 1440 minutes (1 day).\n\n"
+        "Use this endpoint to obtain a Bearer token for authenticated requests."
+    ),
+    status_code=status.HTTP_200_OK,
+    operation_id="login_for_access_token"
+)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db)

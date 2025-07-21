@@ -21,7 +21,12 @@ category_router = APIRouter(
 )
 
 
-@category_router.post("/", response_model=CategoryRead, status_code=status.HTTP_201_CREATED)
+@category_router.post(
+    "/",
+    response_model=CategoryRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new category",
+    description="Create a new category for the current authenticated user.")
 def create_new_category(
     category: CategoryCreate,
     db: Session = Depends(get_db),
@@ -30,6 +35,11 @@ def create_new_category(
     return create_category(db, category, current_user)
 
 
+@category_router.get(
+    "/",
+    response_model=List[CategoryRead],
+    summary="Get all categories for current user",
+    description="Retrieve all categories that belong to the authenticated user.")
 @category_router.get("/", response_model=List[CategoryRead])
 def read_user_categories(
     db: Session = Depends(get_db),
@@ -38,6 +48,12 @@ def read_user_categories(
     return get_categories(db, current_user)
 
 
+@category_router.get(
+    "/{category_id}",
+    response_model=CategoryRead,
+    summary="Get a category by ID",
+    description="Retrieve a single category by its ID if it belongs to the authenticated user.",
+    responses={404: {"description": "Category not found"}})
 @category_router.get("/{category_id}", response_model=CategoryRead)
 def read_single_category(
     category_id: int,
@@ -50,7 +66,13 @@ def read_single_category(
     return category
 
 
-@category_router.put("/{category_id}", response_model=CategoryRead)
+
+@category_router.put(
+    "/{category_id}",
+    response_model=CategoryRead,
+    summary="Update a category by ID",
+    description="Update a category's details if it belongs to the authenticated user.",
+    responses={404: {"description": "Category not found or not owned by user"}})
 def update_existing_category(
     category_id: int,
     update_data: CategoryUpdate,
@@ -63,7 +85,12 @@ def update_existing_category(
     return category
 
 
-@category_router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+@category_router.delete(
+    "/{category_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a category by ID",
+    description="Delete a category if it belongs to the authenticated user.",
+    responses={404: {"description": "Category not found or not owned by user"}})
 def delete_existing_category(
     category_id: int,
     db: Session = Depends(get_db),

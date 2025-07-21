@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
-
+from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List
 from sqlalchemy.orm import Session
 
 from app.db import get_db
@@ -15,20 +15,20 @@ user_router = APIRouter(
 )
 
 
-@user_router.get('/', response_model=list[UserSchema])
+@user_router.get('/', response_model=List[UserSchema], summary="List all users")
 def user_list(db: Session = Depends(get_db)):
     db_users = get_users(db)
 
     return db_users
 
 
-@user_router.get('/me', response_model=UserSchema)
+@user_router.get('/me', response_model=UserSchema, summary="Get current authenticated user")
 def user_list(current_user: User = Depends(get_current_active_user)):
     return current_user
 
 
 
-@user_router.get('/{user_id}', response_model=UserSchema)
+@user_router.get('/{user_id}', response_model=UserSchema, summary="Get user details by ID")
 def user_detail(user_id: int, db: Session = Depends(get_db)):
     db_user = get_user(db, user_id)
     if db_user is None:
@@ -37,7 +37,7 @@ def user_detail(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 
-@user_router.delete('/{user_id}')
+@user_router.delete('/{user_id}', status_code=status.HTTP_204_NO_CONTENT, summary="Delete a user by ID")
 def user_delete(user_id: int, db: Session = Depends(get_db)):
     db_user = get_user(db, user_id)
     if db_user is None:
@@ -47,6 +47,6 @@ def user_delete(user_id: int, db: Session = Depends(get_db)):
     return {"message": "User deleted"}
 
 
-@user_router.post("/", response_model=UserSchema)
+@user_router.post("/", response_model=UserSchema, status_code=status.HTTP_201_CREATED, summary="Create a new user")
 def user_post(user: UserCreate, db:Session = Depends(get_db)):
     return create_user(db, user)
